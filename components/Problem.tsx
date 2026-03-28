@@ -59,7 +59,8 @@ export default function Problem({
       return
     }
 
-    if (!session?.user?.id) {
+    const sessionUserId = (session?.user as any)?.id
+    if (!sessionUserId) {
       alert('Please sign in to mark problems as solved and earn points!')
       return
     }
@@ -67,7 +68,7 @@ export default function Problem({
     setIsLoading(true)
     try {
       const { error } = await supabase.from('user_problems').upsert({
-        user_id: session.user.id,
+        user_id: sessionUserId,
         problem_id: problemId,
         solved: true,
         solved_at: new Date().toISOString(),

@@ -79,6 +79,9 @@ export default function ListLayoutWithTags({
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Guard against null pathname
+  if (!pathname) return null
+
   // Infer difficulty from tags or content
   const getPostDifficulty = (post: CoreContent<Blog>): Difficulty => {
     const tags = post.tags || []

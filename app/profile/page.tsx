@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth-options'
 import { supabase } from '@/lib/supabase'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
@@ -8,15 +8,17 @@ import Link from 'next/link'
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions)
 
-  if (!session?.user?.id) {
+  if (!session?.user) {
     redirect('/auth/signin')
   }
+
+  const userId = (session.user as any).id
 
   // Fetch user data
   const { data: user } = await supabase
     .from('users')
     .select('*')
-    .eq('id', session.user.id)
+    .eq('id', userId)
     .single()
 
   // Fetch recent solved problems
@@ -31,7 +33,7 @@ export default async function ProfilePage() {
         points
       )
     `)
-    .eq('user_id', session.user.id)
+    .eq('user_id', userId)
     .eq('solved', true)
     .order('solved_at', { ascending: false })
     .limit(5)
